@@ -1,5 +1,7 @@
-#Vounwarp
-##Distortion correction package
+# Vounwarp
+
+## Distortion correction package
+
 
 **Vounwarp** is an open-source Python package for calculating distortion coefficients
 from a grid pattern image. It is the implementation of published methods, Nghia T. Vo et al.
