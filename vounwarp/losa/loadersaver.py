@@ -208,7 +208,7 @@ def save_image(file_path, mat, overwrite=True):
     return file_path
 
 
-def save_plot_image(file_path, list_lines, height, width, overwrite=True):
+def save_plot_image(file_path, list_lines, height, width, overwrite=True, dpi=100):
     """
     Save the plot of dot-centroids to an image.
     Useful to check if the dots are arranged properly.
@@ -228,18 +228,17 @@ def save_plot_image(file_path, list_lines, height, width, overwrite=True):
     _create_folder(file_path)
     if not overwrite:
         file_path = _create_file_name(file_path)
-    use_dpi = 200.0
     fig = plt.figure(frameon=False)
-    fig.set_size_inches(width / use_dpi, height / use_dpi)
+    fig.set_size_inches(width / dpi, height / dpi)
     ax = plt.Axes(fig, [0., 0., 1.0, 1.0])
     ax.set_axis_off()
     fig.add_axes(ax)
     plt.axis((0, width, 0, height))
-    m_size = 0.5 * min(height / use_dpi, width / use_dpi)
+    m_size = 0.5 * min(height / dpi, width / dpi)
     for line in list_lines:
         plt.plot(line[:, 1], height - line[:, 0], '-o',  markersize=m_size)
     try:
-        plt.savefig(file_path, dpi=use_dpi)
+        plt.savefig(file_path, dpi=dpi)
     except IOError:
         print("Couldn't write to file {}").format(file_path)
         raise
@@ -247,7 +246,7 @@ def save_plot_image(file_path, list_lines, height, width, overwrite=True):
     return file_path
 
 
-def save_residual_plot(file_path, list_data, height, width, overwrite=True):
+def save_residual_plot(file_path, list_data, height, width, overwrite=True, dpi=100):
     """
     Save the plot of the residual vs radius to an image.
     Useful to check the accuracy of the unwarping results.
@@ -257,7 +256,7 @@ def save_residual_plot(file_path, list_data, height, width, overwrite=True):
                 - height, width : Shape of the image.
                 - overwrite: Overwrite the existing file if True.
     ---------
-    Return :    - Updated file path.   
+    Return :    - Updated file path.
     """
     if ("\\" in file_path):
         raise ValueError(
@@ -265,20 +264,20 @@ def save_residual_plot(file_path, list_data, height, width, overwrite=True):
     _create_folder(file_path)
     if not overwrite:
         file_path = _create_file_name(file_path)
-    use_dpi = 200.0
     fig = plt.figure(frameon=False)
-    fig.set_size_inches(width / use_dpi, height / use_dpi)
-    m_size = 0.5 * min(height / use_dpi, width / use_dpi)
+    fig.set_size_inches(width / dpi, height / dpi)
+    m_size = 0.5 * min(height / dpi, width / dpi)
     plt.rc('font', size=np.int16(m_size * 3))
     plt.xlabel('Radius')
     plt.ylabel('Residual')
     plt.plot(list_data[:, 0], list_data[:, 1], '.',  markersize=m_size)
     try:
-        plt.savefig(file_path, dpi=use_dpi, bbox_inches='tight')
+        plt.savefig(file_path, dpi=dpi, bbox_inches='tight')
     except IOError:
         print("Couldn't write to file {}").format(file_path)
         raise
     plt.close()
+    return file_path
 
 
 def save_hdf_file(file_path, idata, key_path='entry', overwrite=True):
