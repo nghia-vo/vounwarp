@@ -38,7 +38,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from scipy.misc import bytescale
-
+import errno
 
 def load_image(file_path):
     """
