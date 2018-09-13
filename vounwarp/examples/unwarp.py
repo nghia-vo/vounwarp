@@ -80,7 +80,7 @@ if (flat_path != "none") and (flat_path != "norm"):
     _, file_ext = os.path.splitext(flat_path)
     if (file_ext == ".hdf") or (file_ext == ".nxs"):
         flat = io.load_hdf_file(
-            file_path, key_path=key_path_hdf, index=None, axis=0)
+            flat_path, key_path=key_path_hdf, index=None, axis=0)
         if len(flat.shape) == 3:
             flat = np.mean(flat, axis=0)
     else:
