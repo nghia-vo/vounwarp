@@ -118,16 +118,16 @@ list_hor_lines = prep.group_dots_hor_lines(
     mat1, hor_slope, dot_dist, ratio=0.3, num_dot_miss=6, accepted_ratio=0.65)
 list_ver_lines = prep.group_dots_ver_lines(
     mat1, ver_slope, dot_dist, ratio=0.3, num_dot_miss=6, accepted_ratio=0.65)
-io.save_plot_image(output_base + "/group_horizontal_dots.png",
-                   list_hor_lines, height, width)
-io.save_plot_image(output_base + "/group_vertical_dots.png",
-                   list_ver_lines, height, width)
 
 # Remove residual dots.
 list_hor_lines = prep.remove_residual_dots_hor(
     list_hor_lines, hor_slope, residual=2.0)
 list_ver_lines = prep.remove_residual_dots_ver(
     list_ver_lines, ver_slope, residual=2.0)
+io.save_plot_image(output_base + "/group_horizontal_dots.png",
+                   list_hor_lines, height, width)
+io.save_plot_image(output_base + "/group_vertical_dots.png",
+                   list_ver_lines, height, width)
 
 # Check if the distortion is significant.
 list_hor_data = post.calc_residual_hor(list_hor_lines, 0.0, 0.0)
