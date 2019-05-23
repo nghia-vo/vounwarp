@@ -19,4 +19,11 @@ Features
 - Some methods may be useful for other applications:
   * Correct non-uniform background using a FFT-based filter and a median filter.
   * Select binary objects in a certain range of values.
-  * Unwarp slices of a 3D dataset. 
+  * Unwarp slices of a 3D dataset.
+
+Install
+=======
+- vounwarp is available on the conda-forge channel. To install:
+.. code-block:: bash
+
+  $ conda install -c conda-forge vounwarp
