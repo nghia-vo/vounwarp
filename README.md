@@ -25,6 +25,4 @@ Install
 =======
 - vounwarp is available on the conda-forge channel. To install:
 
-.. code-block:: bash
-
   $ conda install -c conda-forge vounwarp
