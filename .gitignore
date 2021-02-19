@@ -3,3 +3,6 @@
 *.pyc
 *.project
 *.pydevproject
+.idea
+dev
+dev/output
