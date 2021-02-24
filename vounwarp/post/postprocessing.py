@@ -26,7 +26,7 @@
 Module of post-processing methods:
 - Unwarp a line of dots, an image.
 - Generate unwarped slices of a 3D dataset.
-- Calculate the residual of the corrected dots.
+- Calculate the residual of unwarped dots.
 """
 import numpy as np
 from scipy import interpolate
@@ -36,19 +36,19 @@ from scipy.ndimage import map_coordinates
 
 def unwarp_line_forward(list_lines, xcenter, ycenter, list_fact):
     """
-    Unwarp lines of dot-centroids using the forward model.
+    Unwarp lines of dot-centroids using a forward model.
     
     Parameters
     ----------
-    list_lines : list of float
-        List of the coordinates of the dot-centroids on the lines.
-    list_fact : list of float
+    list_lines : list of 2D arrays
+        List of the coordinates of dot-centroids on each line.
+    list_fact : list of floats
         Polynomial coefficients of the forward model.
     
     Returns
     -------
-    list_ulines : list of float
-        List of the corrected coordinates of the dot-centroids on the lines.
+    list_ulines : list of 2D arrays
+        List of the unwarped coordinates of dot-centroids on each line.
     """
     list_ulines = []
     list_expo = np.arange(len(list_fact), dtype=np.int16)
@@ -72,19 +72,21 @@ def _func_diff(ru, rd, *list_fact):
 
 def unwarp_line_backward(list_lines, xcenter, ycenter, list_fact):
     """
-    Unwarp lines of dot-centroids using the forward model.
+    Unwarp lines of dot-centroids using a backward model. The method finds the
+    coordinates of undistorted points from the coordinates of distorted
+    points using numerical optimzation.
     
     Parameters
     ----------
-    list_lines : list of float
-        List of the coordinates of the dot-centroids on the lines.
-    list_fact : list of float
+    list_lines : list of 2D arrays
+        List of the coordinates of dot-centroids on each line.
+    list_fact : list of floats
         Polynomial coefficients of the backward model.
     
     Returns
     -------
-    list_ulines : list of float
-        List of the corrected coordinates of the dot-centroids on the lines.
+    list_ulines : list of 2D arrays
+        List of the unwarped coordinates of dot-centroids on each line.
     """
     list_ulines = []
     for _, line in enumerate(list_lines):
@@ -106,11 +108,11 @@ def unwarp_line_backward(list_lines, xcenter, ycenter, list_fact):
 
 def unwarp_image_backward(mat, xcenter, ycenter, list_fact):
     """
-    Unwarp a 2D array using the backward model.
+    Unwarp an image using a backward model.
     
     Parameters
     ----------
-    mat : float
+    mat : array_like
         2D array.
     xcenter : float
         Center of distortion in x-direction.
@@ -121,8 +123,8 @@ def unwarp_image_backward(mat, xcenter, ycenter, list_fact):
     
     Returns
     -------
-    float
-        2D array. Distortion corrected.
+    array_like
+        2D array. Distortion-corrected image.
     """
     (height, width) = mat.shape
     xu_list = np.arange(width) - xcenter
@@ -141,8 +143,8 @@ def unwarp_image_backward(mat, xcenter, ycenter, list_fact):
 
 def unwarp_image_forward(mat, xcenter, ycenter, list_fact):
     """
-    Unwarp a 2D array using the forward model.
-    Should be used only for testing due to the problem of vacant pixels.
+    Unwarp an image using a forward model. Should be used only for assessment
+    due to the problem of vacant pixels.
     
     Parameters
     ----------
@@ -152,13 +154,13 @@ def unwarp_image_forward(mat, xcenter, ycenter, list_fact):
         Center of distortion in x-direction.
     ycenter : float
         Center of distortion in y-direction.
-    list_fact : list of float
+    list_fact : list of floats
         Polynomial coefficients of the forward model.
     
     Returns
     -------
-    float
-        2D array. Distortion corrected.
+    array_like
+        2D array. Distortion-corrected image.
     """
     (height, width) = mat.shape
     xd_list = np.arange(width) - xcenter
@@ -168,46 +170,39 @@ def unwarp_image_forward(mat, xcenter, ycenter, list_fact):
     fact_mat = np.sum(
         np.asarray([factor * rd_mat**i for i,
                     factor in enumerate(list_fact)]), axis=0)
-    xu_mat = np.int16(
+    xu_mat = np.intp(
         np.round(np.clip(xcenter + fact_mat * xd_mat, 0, width - 1)))
-    yu_mat = np.int16(
+    yu_mat = np.intp(
         np.round(np.clip(ycenter + fact_mat * yd_mat, 0, height - 1)))
     mat_unw = np.zeros_like(mat)
-    mat_norm = np.zeros_like(mat)
-    for i in range(height):
-        for j in range(width):
-            posi = yu_mat[i, j]
-            posj = xu_mat[i, j]
-            mat_unw[posi, posj] += mat[i, j]
-            mat_norm[posi, posj] += 1
-    mat_norm[mat_norm == 0.0] = 1
-    return mat_unw / mat_norm
+    mat_unw[yu_mat, xu_mat] = mat
+    return mat_unw
 
 
 def unwarp_slice_backward(mat3D, xcenter, ycenter, list_fact, index):
     """
-    Generate an unwarped slice [:,index.:] of a 3D dataset, i.e
+    Generate an unwarped slice [:,index.:] of a 3D dataset, i.e.
     one unwarped sinogram of a 3D tomographic data.
     
     Parameters
     ----------
-    mat3D : float
-        3D array.
+    mat3D : array_like
+        3D array. Correction is applied along axis 1.
     xcenter : float
         Center of distortion in x-direction.
     ycenter : float
         Center of distortion in y-direction.
-    list_fact : list of float
-        Polynomial coefficients of the backward model.
+    list_fact : list of floats
+        Polynomial coefficients of a backward model.
     index : int
         Index of the slice
     
     Returns
     -------
-    float
-        2D array. Distortion corrected.
+    array_like
+        2D array. Distortion-corrected slice.
     """
-    if (len(mat3D.shape) < 3):
+    if len(mat3D.shape) < 3:
         raise ValueError("Input must be a 3D data")
     (depth, height, width) = mat3D.shape
     xu_list = np.arange(0, width) - xcenter
@@ -235,48 +230,48 @@ def _mapping(mat, xmat, ymat):
     
     Parameters
     ----------
-    mat : float
+    mat : array_like
         2D array.
-    xmat : float
-        2D array of the x-coordinates.
-    ymat : float
-        2D array of the y-coordinates.
+    xmat : array_like
+        2D array of x-coordinates.
+    ymat : array_like
+        2D array of y-coordinates.
     
     Returns
     -------
-    float
+    array_like
         2D array. 
     """
-    indices = np.reshape(ymat, (-1, 1)), np.reshape(xmat, (-1, 1))
-    mat = map_coordinates(mat, indices, order=1, mode='reflect')
+    coord = np.vstack((np.ndarray.flatten(ymat), np.ndarray.flatten(xmat)))
+    mat = map_coordinates(mat, coord, order=1, mode='reflect')
     return mat.reshape(xmat.shape)    
 
 
 def unwarp_chunk_slices_backward(mat3D, xcenter, ycenter, list_fact,
                                  start_index, stop_index):
     """
-    Generate a chunk  of unwarped slices [:,start_index: stop_index, :].
-    Useful for correcting 3D tomographic data.
+    Generate a chunk  of unwarped slices [:,start_index: stop_index, :] used
+    for tomographic data.
     
     Parameters
     ----------
-    mat3D : float
-        3D array.
+    mat3D : array_like
+        3D array. Correction is applied along axis 1.
     xcenter : float
         Center of distortion in x-direction.
     ycenter : float
         Center of distortion in y-direction.
-    list_fact : list of float
-        Polynomial coefficients of the backward model.
+    list_fact : list of floats
+        Polynomial coefficients of a backward model.
     start_index : int
-        Starting index of the slice.
+        Starting index of slices.
     stop_index : int
-        Stopping index of the slice.
+        Stopping index of slices.
     
     Returns
     -------
-    float
-        3D array. Distortion corrected.
+    array_like
+        3D array. Distortion-corrected slices.
     """
     if (len(mat3D.shape) < 3):
         raise ValueError("Input must be a 3D data")
@@ -318,14 +313,15 @@ def unwarp_chunk_slices_backward(mat3D, xcenter, ycenter, list_fact,
 
 def calc_residual_hor(list_ulines, xcenter, ycenter):
     """
-    Calculate the distances of corrected dots (on the horizontal lines)
-    to fitted straight lines.
-    Useful to check the straightness of the unwarped lines.     
+    Calculate the distances of unwarped dots (on each horizontal line) to
+    each fitted straight line which is used to assess the straightness of
+    unwarped lines.
     
     Parameters
     ----------
-    list_ulines : list of float
-        List of the unwarped horizontal lines.
+    list_ulines : list of 2D arrays
+        List of the coordinates of dot-centroids on each unwarped horizontal
+        line.
     xcenter : float
         Center of distortion in x-direction.
     ycenter : float
@@ -333,10 +329,10 @@ def calc_residual_hor(list_ulines, xcenter, ycenter):
     
     Returns
     -------
-    list of float
-        2D array: each element has two values: 1) Distance of a dot to 
-        the center of distortion; 2) Distance of a dot to the fitted 
-        straight line. 
+    array_like
+        2D array. Each element has two values: 1) Distance of a dot to the
+        center of distortion; 2) Distance of this dot to the nearest fitted
+        straight line.
     """
     list_data = []
     for i, line in enumerate(list_ulines):
@@ -354,14 +350,14 @@ def calc_residual_hor(list_ulines, xcenter, ycenter):
 
 def calc_residual_ver(list_ulines, xcenter, ycenter):
     """
-    Calculate the distances of corrected dots (on the vertical lines)
-    to fitted straight lines.
-    Useful to check the straightness of the unwarped lines.     
+    Calculate the distances of unwarped dots (on each vertical line) to each
+    fitted straight line which is used to assess the straightness of unwarped
+    lines.
     
     Parameters
     ----------
-    list_ulines : list of float
-        List of the unwarped vertical lines.
+    list_ulines : list of 2D arrays
+        List of the coordinates of dot-centroids on each unwarped vertical line.
     xcenter : float
         Center of distortion in x-direction.
     ycenter : float
@@ -369,9 +365,9 @@ def calc_residual_ver(list_ulines, xcenter, ycenter):
     
     Returns
     -------
-    list of float
-        2D array: each element has two values: 1) Distance of a dot to 
-        the center of distortion; 2) Distance of a dot to the fitted 
+    array_like
+        2D array. Each element has two values: 1) Distance of a dot to the
+        center of distortion; 2) Distance of this dot to the nearest fitted
         straight line. 
     """
     list_data = []
@@ -390,14 +386,14 @@ def calc_residual_ver(list_ulines, xcenter, ycenter):
 
 def check_distortion(list_data):
     """
-    Check if the distortion is significant or not.
-    If the number of dots having the residual greater than 1 pixel
-    is greater than 15% of the total number of dots, there's distortion.     
+    Check if the distortion is significant or not. If the number of dots
+    having the residual greater than 1 pixel is greater than 15% of the total
+    number of dots, there's distortion.
     
     Parameters
     ----------
-    list_data : list of float
-        List of [radius, residual] of the dots.             
+    list_data : array_like
+        List of [radius, residual] of each dot.
     
     Returns
     -------
