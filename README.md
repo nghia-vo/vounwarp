@@ -28,13 +28,14 @@ a 3D dataset; evaluating the accuracy of correction results.
 
 Install
 =======
-- *vounwarp* is available on the conda-forge channel. To install: 1) Install 
-[Miniconda](https://docs.conda.io/en/latest/miniconda.html) (just to run conda) 
-or [Anaconda](https://www.anaconda.com/products/individual) (conda + loads of 
-python packages). 2) Open a command prompt/terminal and run the following command:
-```commandline
-$ conda install -c conda-forge vounwarp
-```
+- *vounwarp* is available on the conda-forge channel. To install: 
+    * Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) 
+    (just to run conda) or [Anaconda](https://www.anaconda.com/products/individual)
+    (conda + loads of python packages). 
+    * Open a command prompt/terminal and run the following command:
+        ```commandline
+        $ conda install -c conda-forge vounwarp
+        ```
 - To install from the source codes:
     * Download the source codes from this github page (click-> Code -> Download ZIP). 
     Unzip to a local folder.
@@ -47,6 +48,7 @@ $ conda install -c conda-forge vounwarp
         $ conda install python
         $ python setup.py install
         ```
+     * Set the python interpreter-path (of your IDE) to ../Anaconda3/envs/vounwarp 
 
 How to use
 ==========
