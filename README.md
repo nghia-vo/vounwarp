@@ -1,6 +1,6 @@
 # Vounwarp
 
-## Distortion correction package
+### Distortion calibration and correction software for tomography detector systems
 
 
 **Vounwarp** is an open-source Python package for radial distortion correction 
