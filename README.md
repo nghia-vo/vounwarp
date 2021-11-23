@@ -12,6 +12,15 @@ pattern image. The package implements methods published, Nghia T. Vo et al.
 tomography" Optics Express 23, 32859-32868 (2015), 
 https://doi.org/10.1364/OE.23.032859. 
 
+Important notice
+----------------
+Vounwarp was changed to Discorpy and maintained at: https://github.com/DiamondLightSource/discorpy
+The latest version, Discorpy 1.4, includes methods for correcting perspective distortion and methods 
+for processing line-pattern images and chessboard images.
+Documentation: https://discorpy.readthedocs.io/en/latest/
+To install from conda-forge channel:
+    conda install -c conda-forge discorpy
+
 Features
 ========
 - Pre-processing methods for finding coordinates of dot-centroids, grouping them
