@@ -16,10 +16,14 @@ Important notice
 ----------------
 Vounwarp was changed to Discorpy and maintained at: https://github.com/DiamondLightSource/discorpy
 The latest version, Discorpy 1.4, includes methods for correcting perspective distortion and methods 
-for processing line-pattern images and chessboard images.
-Documentation: https://discorpy.readthedocs.io/en/latest/
-To install from conda-forge channel:
-    conda install -c conda-forge discorpy
+for processing line-pattern images and chessboard images. 
+
+Documentation: https://discorpy.readthedocs.io/en/latest/ 
+
+To install from conda-forge channel: 
+```commandline
+$ conda install -c conda-forge discorpy
+```
 
 Features
 ========
